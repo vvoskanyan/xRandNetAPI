@@ -7,31 +7,38 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 @Controller
-@RequestMapping(path = "/demo")
-public class TestController {
+@RequestMapping(path = "/account")
+public class AccountController {
     private final UserRepository userRepository;
 
     @Autowired
-    public TestController(UserRepository userRepository) {
+    public AccountController(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 
-    @RequestMapping(method = RequestMethod.POST, path = "/add")
+    @RequestMapping(method = RequestMethod.POST, path = "/register")
     public @ResponseBody
-    String addNewUser(@RequestParam String username
+    User addNewUser(@RequestParam String username
             , @RequestParam String password) {
 
-        User n = new User();
-        n.setUsername(username);
-        n.setPassword(password);
-        userRepository.save(n);
-        return "Saved";
+        User newUser = new User();
+        newUser.setUsername(username);
+        newUser.setPassword(password);
+        userRepository.save(newUser);
+        return newUser;
     }
 
-    @GetMapping(path = "/all")
+    @GetMapping(path = "/login")
     public @ResponseBody
     Iterable<User> getAllUsers() {
         return userRepository.findAll();
+    }
+
+
+    @GetMapping(path = "/getByUsername")
+    public @ResponseBody
+    User getAllUsers(@RequestParam String username) {
+        return userRepository.findByUsername(username);
     }
 
     @DeleteMapping(path = "/delete")
