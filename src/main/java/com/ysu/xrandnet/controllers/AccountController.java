@@ -1,10 +1,19 @@
 package com.ysu.xrandnet.controllers;
 
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.JsonDeserializer;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.util.JSONPObject;
 import com.ysu.xrandnet.models.User;
 import com.ysu.xrandnet.repos.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+
+import java.io.IOException;
 
 @Controller
 @RequestMapping(path = "/account")
@@ -16,35 +25,26 @@ public class AccountController {
         this.userRepository = userRepository;
     }
 
-    @RequestMapping(method = RequestMethod.POST, path = "/register")
+    @ResponseStatus(code = HttpStatus.OK)
+    @RequestMapping(method = RequestMethod.POST, path = "/register", consumes = {"application/json"})
     public @ResponseBody
-    User addNewUser(@RequestParam String username
-            , @RequestParam String password) {
-
-        User newUser = new User();
-        newUser.setUsername(username);
-        newUser.setPassword(password);
-        userRepository.save(newUser);
-        return newUser;
+    User addNewUser(@RequestBody User user) {
+//        this.userRepository.save(user);
+        return user;
     }
 
+    @ResponseStatus(code = HttpStatus.OK)
     @GetMapping(path = "/login")
     public @ResponseBody
-    Iterable<User> getAllUsers() {
-        return userRepository.findAll();
+    User getAllUsers() {
+        return null;
     }
 
-
-    @GetMapping(path = "/getByUsername")
+    @ResponseStatus(code = HttpStatus.OK)
+    @DeleteMapping(path = "/delete/{username}")
     public @ResponseBody
-    User getAllUsers(@RequestParam String username) {
-        return userRepository.findByUsername(username);
-    }
-
-    @DeleteMapping(path = "/delete")
-    public @ResponseBody
-    String deleteAllUsers() {
-        userRepository.deleteAll();
+    String deleteUser(@PathVariable String username) {
+        userRepository.deleteByUsername(username);
         return "Deleted";
     }
 }

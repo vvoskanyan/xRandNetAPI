@@ -3,26 +3,15 @@ package com.ysu.xrandnet.models;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "release_notes")
-public class ReleaseNote {
+@Table(name = "bugs")
+public class Bug {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id")
     private int id;
 
-    @Column(name = "version", unique = true, nullable = false)
-    private String version;
-
-    @Column(name = "description", nullable = false)
+    @Column(name = "description")
     private String description;
-
-    public String getVersion() {
-        return version;
-    }
-
-    public void setVersion(String version) {
-        this.version = version;
-    }
 
     public String getDescription() {
         return description;

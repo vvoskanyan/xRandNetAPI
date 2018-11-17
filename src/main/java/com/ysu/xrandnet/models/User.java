@@ -12,10 +12,10 @@ public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "user_id")
+    @Column(name = "id")
     private int id;
 
-    @Column(name = "username")
+    @Column(name = "username", unique = true, nullable = false)
     @NotEmpty(message = "*Please provide a username")
     private String username;
 
@@ -24,11 +24,11 @@ public class User {
     @NotEmpty(message = "*Please provide your password")
     private String password;
 
-    @Column(name = "name")
+    @Column(name = "name", nullable = false)
     @NotEmpty(message = "*Please provide your name")
     private String name;
 
-    @Column(name = "last_name")
+    @Column(name = "last_name", nullable = false)
     @NotEmpty(message = "*Please provide your last name")
     private String lastName;
 
