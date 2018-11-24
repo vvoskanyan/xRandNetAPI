@@ -29,9 +29,11 @@ dependencies {
     compile('org.springframework.boot:spring-boot-starter-data-jpa')
     compile('org.springframework.boot:spring-boot-starter-jdbc')
     compile('org.springframework.boot:spring-boot-starter-test')
+    compile("org.springframework.boot:spring-boot-starter-security")
     compile('org.springframework.boot:spring-boot-devtools')
     compile('org.springframework.boot:spring-boot-configuration-processor')
     compile('org.springframework.session:spring-session-jdbc')
     compile('org.springframework.security:spring-security-core')
+    compile ('com.auth0:java-jwt:3.4.0')
     compile('mysql:mysql-connector-java')
 }

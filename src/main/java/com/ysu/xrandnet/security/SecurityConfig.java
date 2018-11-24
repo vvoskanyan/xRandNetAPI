@@ -1,4 +1,4 @@
-package com.ysu.xrandnet.config;
+package com.ysu.xrandnet.security;
 
 
 import org.springframework.context.annotation.Bean;

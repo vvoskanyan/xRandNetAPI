@@ -1,7 +1,7 @@
 package com.ysu.xrandnet.controllers;
 
 import com.ysu.xrandnet.models.User;
-import com.ysu.xrandnet.services.UserService;
+import com.ysu.xrandnet.services.UserDetailsServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -11,11 +11,11 @@ import org.springframework.web.bind.annotation.*;
 @Controller
 @RequestMapping(path = "/account")
 public class AccountsController {
-    private final UserService userService;
+    private final UserDetailsServiceImpl userService;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
     @Autowired
-    public AccountsController(UserService userService, BCryptPasswordEncoder bCryptPasswordEncoder) {
+    public AccountsController(UserDetailsServiceImpl userService, BCryptPasswordEncoder bCryptPasswordEncoder) {
         this.userService = userService;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
     }
@@ -25,7 +25,6 @@ public class AccountsController {
     public @ResponseBody
     User addNewUser(@RequestBody User user) {
         user.setPassword(this.bCryptPasswordEncoder.encode(user.getPassword()));
-        this.userService.saveUser(user);
         return user;
     }
 
@@ -40,7 +39,6 @@ public class AccountsController {
     @DeleteMapping(path = "/delete/{username}")
     public @ResponseBody
     String deleteUser(@PathVariable String username) {
-        userService.deleteByUsername(username);
         return "Deleted";
     }
 }
