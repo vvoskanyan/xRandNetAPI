@@ -25,16 +25,13 @@ repositories {
 
 
 dependencies {
-    compile group: 'org.springframework.security', name: 'spring-security-core', version: '5.1.1.RELEASE'
     compile("org.springframework.boot:spring-boot-starter-web")
-    compile 'org.springframework.boot:spring-boot-starter-data-jpa'
-    compile 'mysql:mysql-connector-java'
-    implementation('org.springframework.boot:spring-boot-starter-data-jpa')
-    implementation('org.springframework.boot:spring-boot-starter-jdbc')
-    implementation('org.springframework.boot:spring-boot-starter-web')
-    implementation('org.springframework.session:spring-session-jdbc')
-    runtimeOnly('org.springframework.boot:spring-boot-devtools')
-    runtimeOnly('mysql:mysql-connector-java')
-    compileOnly('org.springframework.boot:spring-boot-configuration-processor')
-    testImplementation('org.springframework.boot:spring-boot-starter-test')
+    compile('org.springframework.boot:spring-boot-starter-data-jpa')
+    compile('org.springframework.boot:spring-boot-starter-jdbc')
+    compile('org.springframework.boot:spring-boot-starter-test')
+    compile('org.springframework.boot:spring-boot-devtools')
+    compile('org.springframework.boot:spring-boot-configuration-processor')
+    compile('org.springframework.session:spring-session-jdbc')
+    compile('org.springframework.security:spring-security-core')
+    compile('mysql:mysql-connector-java')
 }
