@@ -1,8 +1,10 @@
 package com.ysu.xrandnet.repos;
 
 import com.ysu.xrandnet.models.AboutInfo;
-import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
-public interface AboutInfoRepository extends CrudRepository<AboutInfo, Integer> {
+@Repository
+public interface AboutInfoRepository extends JpaRepository<AboutInfo, Integer> {
     AboutInfo findById(int id);
 }

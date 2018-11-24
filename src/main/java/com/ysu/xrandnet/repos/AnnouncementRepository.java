@@ -1,8 +1,8 @@
 package com.ysu.xrandnet.repos;
 
 import com.ysu.xrandnet.models.Announcement;
-import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface AnnouncementRepository extends CrudRepository<Announcement, Integer> {
+public interface AnnouncementRepository extends JpaRepository<Announcement, Integer> {
     Announcement findById(int id);
 }

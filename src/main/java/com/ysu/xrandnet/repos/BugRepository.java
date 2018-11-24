@@ -1,8 +1,8 @@
 package com.ysu.xrandnet.repos;
 
 import com.ysu.xrandnet.models.Bug;
-import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface BugRepository extends CrudRepository<Bug, Integer> {
+public interface BugRepository extends JpaRepository<Bug, Integer> {
     Bug findById(int id);
 }
