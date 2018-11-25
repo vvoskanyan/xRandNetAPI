@@ -11,6 +11,8 @@ import com.ysu.xrandnet.payloads.SignUpRequest;
 import com.ysu.xrandnet.repos.RoleRepository;
 import com.ysu.xrandnet.repos.UserRepository;
 import com.ysu.xrandnet.security.JWTTokenProvider;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,6 +30,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import javax.validation.Valid;
 import java.net.URI;
 import java.util.Collections;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -58,7 +61,7 @@ public class AuthenticationController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
+    public String authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
 
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
@@ -70,7 +73,22 @@ public class AuthenticationController {
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         String jwt = tokenProvider.generateToken(authentication);
-        return ResponseEntity.ok(new JWTAuthenticationResponse(jwt));
+        JWTAuthenticationResponse jwtResponse = new JWTAuthenticationResponse(jwt);
+        Optional<User> user = this.userRepository.findByUsername(loginRequest.getUsername());
+        JSONObject jsonObject = new JSONObject();
+        if (user.isPresent()) {
+            try {
+                jsonObject.put("id", user.get().getId());
+                jsonObject.put("username", user.get().getUsername());
+                jsonObject.put("firstName", user.get().getFirstName());
+                jsonObject.put("lastName", user.get().getLastName());
+                jsonObject.put("token", jwtResponse.getAccessToken());
+                jsonObject.put("tokenType", jwtResponse.getTokenType());
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+        return jsonObject.toString();
     }
 
     @PostMapping("/register")
