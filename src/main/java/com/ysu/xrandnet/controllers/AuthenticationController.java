@@ -29,7 +29,9 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.validation.Valid;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -71,17 +73,21 @@ public class AuthenticationController {
         );
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
-
         String jwt = tokenProvider.generateToken(authentication);
         JWTAuthenticationResponse jwtResponse = new JWTAuthenticationResponse(jwt);
         Optional<User> user = this.userRepository.findByUsername(loginRequest.getUsername());
         JSONObject jsonObject = new JSONObject();
         if (user.isPresent()) {
             try {
+                List<Integer> roleIds = new ArrayList<Integer>();
+                for (Role role : user.get().getRoles()) {
+                    roleIds.add(role.getName().getRoleNameId());
+                }
                 jsonObject.put("id", user.get().getId());
                 jsonObject.put("username", user.get().getUsername());
                 jsonObject.put("firstName", user.get().getFirstName());
                 jsonObject.put("lastName", user.get().getLastName());
+                jsonObject.put("roles", roleIds);
                 jsonObject.put("token", jwtResponse.getAccessToken());
                 jsonObject.put("tokenType", jwtResponse.getTokenType());
             } catch (JSONException e) {
@@ -113,6 +119,7 @@ public class AuthenticationController {
         URI location = ServletUriComponentsBuilder
                 .fromCurrentContextPath().path("/api/users/{username}")
                 .buildAndExpand(result.getUsername()).toUri();
+
 
         return ResponseEntity.created(location).body(new ApiResponse(true, "User registered successfully"));
     }

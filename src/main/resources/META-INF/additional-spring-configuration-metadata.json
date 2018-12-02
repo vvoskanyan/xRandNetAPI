@@ -1,0 +1,14 @@
+{
+  "properties": [
+    {
+      "name": "xrandnet.jwtSecret",
+      "type": "java.lang.String",
+      "description": "Description for xrandnet.jwtSecret."
+    },
+    {
+      "name": "xrandnet.jwtExpirationInMs",
+      "type": "java.lang.String",
+      "description": "Description for xrandnet.jwtExpirationInMs."
+    }
+  ]
+}
