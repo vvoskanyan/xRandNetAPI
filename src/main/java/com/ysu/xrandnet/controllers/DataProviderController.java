@@ -1,17 +1,16 @@
 package com.ysu.xrandnet.controllers;
 
-import com.ysu.xrandnet.models.AboutInfo;
-import com.ysu.xrandnet.models.Announcement;
-import com.ysu.xrandnet.models.Bug;
-import com.ysu.xrandnet.models.ReleaseNote;
-import com.ysu.xrandnet.repos.AboutInfoRepository;
-import com.ysu.xrandnet.repos.AnnouncementRepository;
-import com.ysu.xrandnet.repos.BugRepository;
-import com.ysu.xrandnet.repos.ReleaseNoteRepository;
+import com.ysu.xrandnet.models.*;
+import com.ysu.xrandnet.repos.*;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.ArrayList;
 
 @Controller
 @RequestMapping(path = "/")
@@ -20,17 +19,19 @@ public class DataProviderController {
     private final ReleaseNoteRepository releaseNoteRepository;
     private final BugRepository bugRepository;
     private final AboutInfoRepository aboutInfoRepository;
+    private final DBFileRepository dbFileRepository;
 
     @Autowired
     public DataProviderController(AnnouncementRepository announcementRepository,
                                   ReleaseNoteRepository releaseNoteRepository,
                                   BugRepository bugRepository,
-                                  AboutInfoRepository aboutInfoRepository) {
+                                  AboutInfoRepository aboutInfoRepository,
+                                  DBFileRepository dbFileRepository) {
         this.announcementRepository = announcementRepository;
         this.releaseNoteRepository = releaseNoteRepository;
         this.bugRepository = bugRepository;
         this.aboutInfoRepository = aboutInfoRepository;
-
+        this.dbFileRepository = dbFileRepository;
     }
 
     @ResponseStatus(code = HttpStatus.OK)
@@ -46,6 +47,25 @@ public class DataProviderController {
     public @ResponseBody
     Iterable<Announcement> getAnnouncements() {
         return this.announcementRepository.findAll();
+    }
+
+    @ResponseStatus(code = HttpStatus.OK)
+    @GetMapping(path = "/appFiles/all")
+    public @ResponseBody
+    String getFiles() {
+        ArrayList<DBFile> arrayList = (ArrayList<DBFile>) this.dbFileRepository.findAll();
+        JSONArray jsonArray = new JSONArray();
+        arrayList.forEach((file) -> {
+            try {
+                JSONObject jsonObject = new JSONObject();
+                jsonObject.put("id", file.getId());
+                jsonObject.put("name", file.getFileName());
+                jsonArray.put(jsonObject);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        });
+        return jsonArray.toString();
     }
 
     @ResponseStatus(code = HttpStatus.OK)

@@ -80,6 +80,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         "/announcements/all",
                         "/releaseNotes/all",
                         "/about",
+                        "/downloadFile/**",
+                        "/appFiles/all/**",
                         "/**/*.png",
                         "/**/*.gif",
                         "/**/*.svg",
