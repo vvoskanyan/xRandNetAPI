@@ -11,6 +11,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.List;
 
 @Controller
 @RequestMapping(path = "/")
@@ -53,13 +54,13 @@ public class DataProviderController {
     @GetMapping(path = "/appFiles/all")
     public @ResponseBody
     String getFiles() {
-        ArrayList<DBFile> arrayList = (ArrayList<DBFile>) this.dbFileRepository.findAll();
+        List<File> arrayList = this.dbFileRepository.findAllFileNameAndIds();
         JSONArray jsonArray = new JSONArray();
         arrayList.forEach((file) -> {
             try {
                 JSONObject jsonObject = new JSONObject();
                 jsonObject.put("id", file.getId());
-                jsonObject.put("name", file.getFileName());
+                jsonObject.put("name", file.getFile_Name());
                 jsonArray.put(jsonObject);
             } catch (JSONException e) {
                 e.printStackTrace();
