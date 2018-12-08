@@ -4,11 +4,14 @@ import javax.persistence.*;
 
 @Entity
 @Table(name = "bugs")
-public class Bug {
+public class Bug extends DateAudit  {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id")
     private int id;
+
+    @Column(name = "summary")
+    private String summary;
 
     @Column(name = "description")
     private String description;
@@ -19,5 +22,17 @@ public class Bug {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public String getSummary() {
+        return summary;
+    }
+
+    public void setSummary(String summary) {
+        this.summary = summary;
+    }
+
+    public int getId() {
+        return id;
     }
 }

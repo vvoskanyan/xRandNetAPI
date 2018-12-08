@@ -6,18 +6,21 @@ import javax.persistence.*;
 
 @Entity
 @Table(name = "files")
-public class DBFile {
+@Inheritance(
+        strategy = InheritanceType.SINGLE_TABLE
+)
+public class DBFile extends DateAudit {
     @Id
     @GeneratedValue(generator = "uuid")
     @GenericGenerator(name = "uuid", strategy = "uuid2")
-    private String id;
+    protected String id;
 
-    private String fileName;
+    protected String fileName;
 
-    private String fileType;
+    protected String fileType;
 
     @Lob
-    private byte[] data;
+    protected byte[] data;
 
     public DBFile() {
 

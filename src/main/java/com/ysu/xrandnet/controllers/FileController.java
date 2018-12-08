@@ -15,10 +15,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
-
 @RestController
 public class FileController {
 
@@ -30,10 +26,23 @@ public class FileController {
     public FileController(DBFileStorageService DBFileStorageService) {
         this.DBFileStorageService = DBFileStorageService;
     }
+//
+//    @PostMapping("/uploadFile")
+//    public UploadFileResponse uploadFile(@RequestParam("file") MultipartFile file) {
+//        DBFile dbFile = DBFileStorageService.storeFile(file);
+//
+//        String fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath()
+//                .path("/downloadFile/")
+//                .path(dbFile.getId())
+//                .toUriString();
+//
+//        return new UploadFileResponse(dbFile.getFileName(), fileDownloadUri,
+//                file.getContentType(), file.getSize());
+//    }
 
-    @PostMapping("/uploadFile")
-    public UploadFileResponse uploadFile(@RequestParam("file") MultipartFile file) {
-        DBFile dbFile = DBFileStorageService.storeFile(file);
+    @PostMapping("/uploadSetupFile")
+    public UploadFileResponse uploadSetupFile(@RequestParam("file") MultipartFile file) {
+        DBFile dbFile = DBFileStorageService.storeSetupFile(file);
 
         String fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath()
                 .path("/downloadFile/")
@@ -44,12 +53,26 @@ public class FileController {
                 file.getContentType(), file.getSize());
     }
 
-    @PostMapping("/uploadMultipleFiles")
-    public List<UploadFileResponse> uploadMultipleFiles(@RequestParam("files") MultipartFile[] files) {
-        return Arrays.stream(files)
-                .map(this::uploadFile)
-                .collect(Collectors.toList());
+    @PostMapping("/uploadUserManualFile")
+    public UploadFileResponse uploadUserManualFile(@RequestParam("file") MultipartFile file) {
+        DBFile dbFile = DBFileStorageService.storeUserManual(file);
+
+        String fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath()
+                .path("/downloadFile/")
+                .path(dbFile.getId())
+                .toUriString();
+
+        return new UploadFileResponse(dbFile.getFileName(), fileDownloadUri,
+                file.getContentType(), file.getSize());
     }
+
+//
+//    @PostMapping("/uploadMultipleFiles")
+//    public List<UploadFileResponse> uploadMultipleFiles(@RequestParam("files") MultipartFile[] files) {
+//        return Arrays.stream(files)
+//                .map(this::uploadFile)
+//                .collect(Collectors.toList());
+//    }
 
     @GetMapping("/downloadFile/{fileId}")
     public ResponseEntity<Resource> downloadFile(@PathVariable String fileId) {

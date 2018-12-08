@@ -7,32 +7,35 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Controller
-@RequestMapping(path = "/")
+@RequestMapping(path = "/publicData")
 public class DataProviderController {
     private final AnnouncementRepository announcementRepository;
     private final ReleaseNoteRepository releaseNoteRepository;
     private final BugRepository bugRepository;
     private final AboutInfoRepository aboutInfoRepository;
-    private final DBFileRepository dbFileRepository;
+    private final UserManualFileRepository userManualFileRepository;
+    private final SetupFileRepository setupFileRepository;
 
     @Autowired
     public DataProviderController(AnnouncementRepository announcementRepository,
                                   ReleaseNoteRepository releaseNoteRepository,
                                   BugRepository bugRepository,
                                   AboutInfoRepository aboutInfoRepository,
-                                  DBFileRepository dbFileRepository) {
+                                  UserManualFileRepository userManualFileRepository,
+                                  SetupFileRepository setupFileRepository) {
         this.announcementRepository = announcementRepository;
         this.releaseNoteRepository = releaseNoteRepository;
         this.bugRepository = bugRepository;
         this.aboutInfoRepository = aboutInfoRepository;
-        this.dbFileRepository = dbFileRepository;
+        this.userManualFileRepository = userManualFileRepository;
+        this.setupFileRepository = setupFileRepository;
     }
 
     @ResponseStatus(code = HttpStatus.OK)
@@ -51,10 +54,10 @@ public class DataProviderController {
     }
 
     @ResponseStatus(code = HttpStatus.OK)
-    @GetMapping(path = "/appFiles/all")
+    @GetMapping(path = "/setupFiles/all")
     public @ResponseBody
-    String getFiles() {
-        List<File> arrayList = this.dbFileRepository.findAllFileNameAndIds();
+    String getSetupFiles() {
+        List<File> arrayList = this.setupFileRepository.findAllFileNameAndIds();
         JSONArray jsonArray = new JSONArray();
         arrayList.forEach((file) -> {
             try {
@@ -67,6 +70,25 @@ public class DataProviderController {
             }
         });
         return jsonArray.toString();
+    }
+
+    @ResponseStatus(code = HttpStatus.OK)
+    @GetMapping(path = "/userManualFile")
+    public @ResponseBody
+    ResponseEntity getUserManualFile() {
+        File file = this.userManualFileRepository.findAllFileNameAndId();
+        if (file != null) {
+            JSONObject jsonObject = new JSONObject();
+            try {
+                jsonObject.put("id", file.getId());
+                jsonObject.put("name", file.getFile_Name());
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            return ResponseEntity.ok().body(jsonObject.toString());
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @ResponseStatus(code = HttpStatus.OK)
