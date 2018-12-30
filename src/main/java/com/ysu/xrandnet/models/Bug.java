@@ -4,7 +4,7 @@ import javax.persistence.*;
 
 @Entity
 @Table(name = "bugs")
-public class Bug extends DateAudit  {
+public class Bug extends DateAudit {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id")
@@ -15,6 +15,9 @@ public class Bug extends DateAudit  {
 
     @Column(name = "description")
     private String description;
+
+    @Column(name = "reporter")
+    private String reporter;
 
     public String getDescription() {
         return description;
@@ -34,5 +37,13 @@ public class Bug extends DateAudit  {
 
     public int getId() {
         return id;
+    }
+
+    public String getReporter() {
+        return reporter;
+    }
+
+    public void setReporter(String reporter) {
+        this.reporter = reporter;
     }
 }
