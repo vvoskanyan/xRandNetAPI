@@ -19,12 +19,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.validation.Valid;
@@ -123,4 +123,32 @@ public class AuthenticationController {
 
         return ResponseEntity.created(location).body(new ApiResponse(true, "User registered successfully"));
     }
+
+    @ResponseStatus(code = HttpStatus.OK)
+    @GetMapping("/logout")
+    public ResponseEntity<?> logout() {
+        SecurityContextHolder.getContext().setAuthentication(null);
+        return ResponseEntity.ok().body(new ApiResponse(true, "User logged out successfully"));
+    }
+
+    @ResponseStatus(code = HttpStatus.OK)
+    @GetMapping(path = "/isAdmin")
+    public @ResponseBody
+    Boolean isAdmin() {
+        SecurityContext context = SecurityContextHolder.getContext();
+        if (context == null)
+            return false;
+
+        Authentication authentication = context.getAuthentication();
+        if (authentication == null)
+            return false;
+
+        for (GrantedAuthority auth : authentication.getAuthorities()) {
+            if ("ROLE_ADMIN".equals(auth.getAuthority()))
+                return true;
+        }
+
+        return false;
+    }
+
 }

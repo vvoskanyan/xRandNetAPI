@@ -2,11 +2,16 @@ package com.ysu.xrandnet.controllers;
 
 import com.ysu.xrandnet.models.*;
 import com.ysu.xrandnet.repos.*;
+import com.ysu.xrandnet.services.DBFileStorageService;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -14,37 +19,32 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @Controller
-@RequestMapping(path = "/publicData")
-public class DataProviderController {
+@RequestMapping(path = "/api/public")
+public class PublicDataController {
     private final AnnouncementRepository announcementRepository;
     private final ReleaseNoteRepository releaseNoteRepository;
     private final BugRepository bugRepository;
+    private final BooksRepository bookRepository;
     private final AboutInfoRepository aboutInfoRepository;
     private final UserManualFileRepository userManualFileRepository;
     private final SetupFileRepository setupFileRepository;
+    private final com.ysu.xrandnet.services.DBFileStorageService dbFileStorageService;
 
     @Autowired
-    public DataProviderController(AnnouncementRepository announcementRepository,
-                                  ReleaseNoteRepository releaseNoteRepository,
-                                  BugRepository bugRepository,
-                                  AboutInfoRepository aboutInfoRepository,
-                                  UserManualFileRepository userManualFileRepository,
-                                  SetupFileRepository setupFileRepository) {
+    public PublicDataController(AnnouncementRepository announcementRepository, ReleaseNoteRepository releaseNoteRepository,
+                                BugRepository bugRepository, BooksRepository bookRepository, AboutInfoRepository aboutInfoRepository,
+                                UserManualFileRepository userManualFileRepository, SetupFileRepository setupFileRepository,
+                                DBFileStorageService dbFileStorageService) {
         this.announcementRepository = announcementRepository;
         this.releaseNoteRepository = releaseNoteRepository;
         this.bugRepository = bugRepository;
+        this.bookRepository = bookRepository;
         this.aboutInfoRepository = aboutInfoRepository;
         this.userManualFileRepository = userManualFileRepository;
         this.setupFileRepository = setupFileRepository;
+        this.dbFileStorageService = dbFileStorageService;
     }
 
-    @ResponseStatus(code = HttpStatus.OK)
-    @RequestMapping(method = RequestMethod.POST, path = "/announcements/add", consumes = {"application/json"})
-    public @ResponseBody
-    Announcement addNewAnnouncement(@RequestBody Announcement announcement) {
-        this.announcementRepository.save(announcement);
-        return announcement;
-    }
 
     @ResponseStatus(code = HttpStatus.OK)
     @GetMapping(path = "/announcements/all")
@@ -77,26 +77,11 @@ public class DataProviderController {
     public @ResponseBody
     ResponseEntity getUserManualFile() {
         File file = this.userManualFileRepository.findAllFileNameAndId();
-        if (file != null) {
-            JSONObject jsonObject = new JSONObject();
-            try {
-                jsonObject.put("id", file.getId());
-                jsonObject.put("name", file.getFile_Name());
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-            return ResponseEntity.ok().body(jsonObject.toString());
-        } else {
-            return ResponseEntity.notFound().build();
-        }
-    }
-
-    @ResponseStatus(code = HttpStatus.OK)
-    @RequestMapping(method = RequestMethod.POST, path = "/releaseNotes/add", consumes = {"application/json"})
-    public @ResponseBody
-    ReleaseNote addNewReleaseNote(@RequestBody ReleaseNote releaseNote) {
-        this.releaseNoteRepository.save(releaseNote);
-        return releaseNote;
+        DBFile dbFile = this.dbFileStorageService.getFile(file.getId());
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(dbFile.getFileType()))
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + dbFile.getFileName() + "\"")
+                .body(new ByteArrayResource(dbFile.getData()));
     }
 
     @ResponseStatus(code = HttpStatus.OK)
@@ -107,37 +92,27 @@ public class DataProviderController {
     }
 
     @ResponseStatus(code = HttpStatus.OK)
-    @RequestMapping(method = RequestMethod.POST, path = "/bugs/add", consumes = {"application/json"})
+    @GetMapping(path = "/books/all")
     public @ResponseBody
-    Bug addNewBug(@RequestBody Bug bug) {
-        this.bugRepository.save(bug);
-        return bug;
-    }
-
-    @ResponseStatus(code = HttpStatus.OK)
-    @GetMapping(path = "/bugs/all")
-    public @ResponseBody
-    Iterable<Bug> getBugs() {
-        return this.bugRepository.findAll();
+    Iterable<Book> getBooks() {
+        return this.bookRepository.findAll();
     }
 
     @ResponseStatus(code = HttpStatus.OK)
     @GetMapping(path = "/about")
     public @ResponseBody
     AboutInfo getAboutInfo() {
-        return this.aboutInfoRepository.findById(1);
+        return this.aboutInfoRepository.findAll().get(0);
     }
 
-    @ResponseStatus(code = HttpStatus.OK)
-    @RequestMapping(method = RequestMethod.POST, path = "/about/edit", consumes = {"application/json"})
-    public @ResponseBody
-    AboutInfo editAboutInfo(@RequestBody AboutInfo aboutInfo) {
-        AboutInfo infoToBeUpdated = this.aboutInfoRepository.findById(1);
-        if (infoToBeUpdated == null) {
-            infoToBeUpdated = new AboutInfo();
-        }
-        infoToBeUpdated.setContent(aboutInfo.getContent());
-        this.aboutInfoRepository.save(infoToBeUpdated);
-        return aboutInfo;
+    @GetMapping("/downloadFile/{fileId}")
+    public ResponseEntity<Resource> downloadFile(@PathVariable String fileId) {
+        // Load file from database
+        DBFile dbFile = dbFileStorageService.getFile(fileId);
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(dbFile.getFileType()))
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + dbFile.getFileName() + "\"")
+                .body(new ByteArrayResource(dbFile.getData()));
     }
 }
