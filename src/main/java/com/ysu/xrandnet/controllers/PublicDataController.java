@@ -24,6 +24,7 @@ public class PublicDataController {
     private final AnnouncementRepository announcementRepository;
     private final ReleaseNoteRepository releaseNoteRepository;
     private final BugRepository bugRepository;
+    private final LinkRepository linkRepository;
     private final BooksRepository bookRepository;
     private final AboutInfoRepository aboutInfoRepository;
     private final UserManualFileRepository userManualFileRepository;
@@ -34,7 +35,7 @@ public class PublicDataController {
     public PublicDataController(AnnouncementRepository announcementRepository, ReleaseNoteRepository releaseNoteRepository,
                                 BugRepository bugRepository, BooksRepository bookRepository, AboutInfoRepository aboutInfoRepository,
                                 UserManualFileRepository userManualFileRepository, SetupFileRepository setupFileRepository,
-                                DBFileStorageService dbFileStorageService) {
+                                DBFileStorageService dbFileStorageService, LinkRepository linkRepository) {
         this.announcementRepository = announcementRepository;
         this.releaseNoteRepository = releaseNoteRepository;
         this.bugRepository = bugRepository;
@@ -43,6 +44,7 @@ public class PublicDataController {
         this.userManualFileRepository = userManualFileRepository;
         this.setupFileRepository = setupFileRepository;
         this.dbFileStorageService = dbFileStorageService;
+        this.linkRepository = linkRepository;
     }
 
 
@@ -96,6 +98,13 @@ public class PublicDataController {
     public @ResponseBody
     Iterable<Book> getBooks() {
         return this.bookRepository.findAll();
+    }
+
+    @ResponseStatus(code = HttpStatus.OK)
+    @GetMapping(path = "/links/all")
+    public @ResponseBody
+    Iterable<Link> getLinks() {
+        return this.linkRepository.findAll();
     }
 
     @ResponseStatus(code = HttpStatus.OK)

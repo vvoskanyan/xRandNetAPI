@@ -13,7 +13,7 @@ public class Bug extends DateAudit {
     @Column(name = "summary")
     private String summary;
 
-    @Column(name = "description")
+    @Column(name = "description", columnDefinition = "text")
     private String description;
 
     @Column(name = "reporter")

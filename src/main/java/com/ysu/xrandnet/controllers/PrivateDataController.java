@@ -11,8 +11,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import javax.persistence.Access;
-
 @Controller
 @RequestMapping(path = "/api/private")
 public class PrivateDataController {
@@ -24,12 +22,13 @@ public class PrivateDataController {
     private final AboutInfoRepository aboutInfoRepository;
     private final UserManualFileRepository userManualFileRepository;
     private final SetupFileRepository setupFileRepository;
+    private final LinkRepository linkRepository;
 
     @Autowired
     public PrivateDataController(AnnouncementRepository announcementRepository, ReleaseNoteRepository releaseNoteRepository,
                                  BugRepository bugRepository, BooksRepository bookRepository, AboutInfoRepository aboutInfoRepository,
                                  UserManualFileRepository userManualFileRepository, SetupFileRepository setupFileRepository,
-                                 DBFileStorageService dbFileStorageService) {
+                                 DBFileStorageService dbFileStorageService, LinkRepository linkRepository) {
         this.announcementRepository = announcementRepository;
         this.releaseNoteRepository = releaseNoteRepository;
         this.bugRepository = bugRepository;
@@ -38,6 +37,7 @@ public class PrivateDataController {
         this.userManualFileRepository = userManualFileRepository;
         this.setupFileRepository = setupFileRepository;
         this.dbFileStorageService = dbFileStorageService;
+        this.linkRepository = linkRepository;
     }
 
     @ResponseStatus(code = HttpStatus.OK)
@@ -83,6 +83,34 @@ public class PrivateDataController {
         this.releaseNoteRepository.save(releaseNote);
         return releaseNote;
     }
+
+    @ResponseStatus(code = HttpStatus.OK)
+    @RequestMapping(method = RequestMethod.POST, path = "/links/add", consumes = {"application/json"})
+    public @ResponseBody
+    Link addNewLink(@RequestBody Link link) {
+        this.linkRepository.save(link);
+        return link;
+    }
+
+    @ResponseStatus(code = HttpStatus.OK)
+    @RequestMapping(method = RequestMethod.POST, path = "/links/delete", consumes = {"application/json"})
+    public @ResponseBody
+    void removeLink(@RequestBody Link link) {
+        this.linkRepository.delete(link);
+    }
+
+    @ResponseStatus(code = HttpStatus.OK)
+    @RequestMapping(method = RequestMethod.POST, path = "/links/edit", consumes = {"application/json"})
+    public @ResponseBody
+    void editLink(@RequestBody Link link) {
+        Link existingLink = this.linkRepository.findById(link.getId());
+        if (existingLink != null) {
+            existingLink.setName(link.getName());
+            existingLink.setUrl(link.getUrl());
+            this.linkRepository.save(link);
+        }
+    }
+
 
     @ResponseStatus(code = HttpStatus.OK)
     @RequestMapping(method = RequestMethod.POST, path = "/announcements/add", consumes = {"application/json"})
