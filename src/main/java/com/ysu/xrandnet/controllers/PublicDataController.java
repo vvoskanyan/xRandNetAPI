@@ -1,5 +1,6 @@
 package com.ysu.xrandnet.controllers;
 
+import com.ysu.xrandnet.exceptions.BadRequestException;
 import com.ysu.xrandnet.models.*;
 import com.ysu.xrandnet.repos.*;
 import com.ysu.xrandnet.services.DBFileStorageService;
@@ -101,10 +102,15 @@ public class PublicDataController {
     }
 
     @ResponseStatus(code = HttpStatus.OK)
-    @GetMapping(path = "/links/all")
+    @GetMapping(path = "/links/{type}/all")
     public @ResponseBody
-    Iterable<Link> getLinks() {
-        return this.linkRepository.findAll();
+    Iterable<Link> getLiteratureLinks(@PathVariable("type") String type) {
+        if (type.equals("general"))
+            return this.linkRepository.findLinkByType(LinkType.GENERAL);
+        else if (type.equals("literature")) {
+            return this.linkRepository.findLinkByType(LinkType.LITERATURE);
+        }
+        throw new BadRequestException("Unknown type of link.");
     }
 
     @ResponseStatus(code = HttpStatus.OK)

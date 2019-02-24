@@ -13,10 +13,11 @@ public class Link {
     @Column(name = "name", columnDefinition = "TEXT")
     private String name;
 
-
     @Column(name = "url", columnDefinition = "TEXT")
     private String url;
 
+    @Column(name = "type", columnDefinition = "TEXT")
+    private LinkType type;
 
     public String getName() {
         return name;
@@ -40,5 +41,13 @@ public class Link {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public LinkType getType() {
+        return type;
+    }
+
+    public void setType(LinkType type) {
+        this.type = type;
     }
 }
