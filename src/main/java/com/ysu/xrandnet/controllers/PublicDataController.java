@@ -24,7 +24,7 @@ import java.util.List;
 public class PublicDataController {
     private final AnnouncementRepository announcementRepository;
     private final ReleaseNoteRepository releaseNoteRepository;
-    private final BugRepository bugRepository;
+    private final PersonRepository personRepository;
     private final LinkRepository linkRepository;
     private final BooksRepository bookRepository;
     private final AboutInfoRepository aboutInfoRepository;
@@ -34,12 +34,12 @@ public class PublicDataController {
 
     @Autowired
     public PublicDataController(AnnouncementRepository announcementRepository, ReleaseNoteRepository releaseNoteRepository,
-                                BugRepository bugRepository, BooksRepository bookRepository, AboutInfoRepository aboutInfoRepository,
+                                BooksRepository bookRepository, AboutInfoRepository aboutInfoRepository,
                                 UserManualFileRepository userManualFileRepository, SetupFileRepository setupFileRepository,
-                                DBFileStorageService dbFileStorageService, LinkRepository linkRepository) {
+                                DBFileStorageService dbFileStorageService, LinkRepository linkRepository, PersonRepository personRepository) {
         this.announcementRepository = announcementRepository;
         this.releaseNoteRepository = releaseNoteRepository;
-        this.bugRepository = bugRepository;
+        this.personRepository = personRepository;
         this.bookRepository = bookRepository;
         this.aboutInfoRepository = aboutInfoRepository;
         this.userManualFileRepository = userManualFileRepository;
@@ -99,6 +99,13 @@ public class PublicDataController {
     public @ResponseBody
     Iterable<Book> getBooks() {
         return this.bookRepository.findAll();
+    }
+
+    @ResponseStatus(code = HttpStatus.OK)
+    @GetMapping(path = "/people/all")
+    public @ResponseBody
+    Iterable<Person> getPeople() {
+        return this.personRepository.findAll();
     }
 
     @ResponseStatus(code = HttpStatus.OK)

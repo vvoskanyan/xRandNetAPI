@@ -6,7 +6,7 @@ import javax.persistence.*;
 @Table(name = "bugs")
 public class Bug extends DateAudit {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.TABLE)
     @Column(name = "id")
     private int id;
 

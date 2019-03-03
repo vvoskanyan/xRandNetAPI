@@ -6,6 +6,7 @@ import com.ysu.xrandnet.repos.*;
 import com.ysu.xrandnet.services.DBFileStorageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -19,6 +20,7 @@ public class PrivateDataController {
     private final ReleaseNoteRepository releaseNoteRepository;
     private final BugRepository bugRepository;
     private final BooksRepository bookRepository;
+    private final PersonRepository personRepository;
     private final AboutInfoRepository aboutInfoRepository;
     private final UserManualFileRepository userManualFileRepository;
     private final SetupFileRepository setupFileRepository;
@@ -28,11 +30,12 @@ public class PrivateDataController {
     public PrivateDataController(AnnouncementRepository announcementRepository, ReleaseNoteRepository releaseNoteRepository,
                                  BugRepository bugRepository, BooksRepository bookRepository, AboutInfoRepository aboutInfoRepository,
                                  UserManualFileRepository userManualFileRepository, SetupFileRepository setupFileRepository,
-                                 DBFileStorageService dbFileStorageService, LinkRepository linkRepository) {
+                                 DBFileStorageService dbFileStorageService, LinkRepository linkRepository, PersonRepository personRepository) {
         this.announcementRepository = announcementRepository;
         this.releaseNoteRepository = releaseNoteRepository;
         this.bugRepository = bugRepository;
         this.bookRepository = bookRepository;
+        this.personRepository = personRepository;
         this.aboutInfoRepository = aboutInfoRepository;
         this.userManualFileRepository = userManualFileRepository;
         this.setupFileRepository = setupFileRepository;
@@ -75,6 +78,15 @@ public class PrivateDataController {
         this.bugRepository.save(bug);
         return bug;
     }
+
+    @ResponseStatus(code = HttpStatus.OK)
+    @RequestMapping(method = RequestMethod.POST, path = "/people/add", consumes = {"application/json"})
+    public @ResponseBody
+    Person addNewPerson(@RequestBody Person person) {
+        this.personRepository.save(person);
+        return person;
+    }
+
 
     @ResponseStatus(code = HttpStatus.OK)
     @RequestMapping(method = RequestMethod.POST, path = "/releaseNotes/add", consumes = {"application/json"})
