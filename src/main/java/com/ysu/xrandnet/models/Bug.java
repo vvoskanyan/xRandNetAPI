@@ -1,5 +1,11 @@
 package com.ysu.xrandnet.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
 import javax.persistence.*;
 
 @Entity
@@ -17,7 +23,9 @@ public class Bug extends DateAudit {
     private String description;
 
     @ManyToOne
-    @JoinColumn
+    @JoinColumn(name = "software_version", nullable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    @JsonIgnore
     private Software software;
 
     public Bug(String summary, String description, Software software, String reporter) {
@@ -25,6 +33,9 @@ public class Bug extends DateAudit {
         this.description = description;
         this.software = software;
         this.reporter = reporter;
+    }
+
+    public Bug() {
     }
 
     @Column(name = "reporter")
@@ -69,5 +80,17 @@ public class Bug extends DateAudit {
 
     public void setSoftware(Software software) {
         this.software = software;
+    }
+
+    public ObjectNode toJson() {
+        ObjectNode node = new ObjectMapper().createObjectNode();
+        node.put("id", this.id);
+        node.put("summary", this.summary);
+        node.put("version", this.software.getVersion());
+        node.put("reporter", this.reporter);
+        node.put("description", this.description);
+        node.put("createdAt", this.getCreatedAt().toString());
+        node.put("updatedAt", this.getUpdatedAt().toString());
+        return node;
     }
 }

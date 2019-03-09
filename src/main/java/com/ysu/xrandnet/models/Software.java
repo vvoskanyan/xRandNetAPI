@@ -17,6 +17,9 @@ public class Software {
     @JoinColumn(name = "file_id", referencedColumnName = "id")
     private SetupFile setupFile;
 
+    public Software() {
+    }
+
     public Software(String version, List<Bug> bugs, SetupFile setupFile) {
         this.version = version;
         this.bugs = bugs;

@@ -1,5 +1,9 @@
 package com.ysu.xrandnet.controllers;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.ysu.xrandnet.exceptions.BadRequestException;
 import com.ysu.xrandnet.models.*;
 import com.ysu.xrandnet.payloads.UploadFileResponse;
 import com.ysu.xrandnet.repos.*;
@@ -11,6 +15,9 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Controller
 @RequestMapping(path = "/api/private")
 public class PrivateDataController {
@@ -19,6 +26,7 @@ public class PrivateDataController {
     private final ReleaseNoteRepository releaseNoteRepository;
     private final BugRepository bugRepository;
     private final BooksRepository bookRepository;
+    private final SoftwareRepository softwareRepository;
     private final PersonRepository personRepository;
     private final AboutInfoRepository aboutInfoRepository;
     private final UserManualFileRepository userManualFileRepository;
@@ -27,12 +35,13 @@ public class PrivateDataController {
 
     @Autowired
     public PrivateDataController(AnnouncementRepository announcementRepository, ReleaseNoteRepository releaseNoteRepository,
-                                 BugRepository bugRepository, BooksRepository bookRepository, AboutInfoRepository aboutInfoRepository,
+                                 BugRepository bugRepository, SoftwareRepository softwareRepository, BooksRepository bookRepository, AboutInfoRepository aboutInfoRepository,
                                  UserManualFileRepository userManualFileRepository, SetupFileRepository setupFileRepository,
                                  DBFileStorageService dbFileStorageService, LinkRepository linkRepository, PersonRepository personRepository) {
         this.announcementRepository = announcementRepository;
         this.releaseNoteRepository = releaseNoteRepository;
         this.bugRepository = bugRepository;
+        this.softwareRepository = softwareRepository;
         this.bookRepository = bookRepository;
         this.personRepository = personRepository;
         this.aboutInfoRepository = aboutInfoRepository;
@@ -73,9 +82,20 @@ public class PrivateDataController {
     @ResponseStatus(code = HttpStatus.OK)
     @RequestMapping(method = RequestMethod.POST, path = "/bugs/add", consumes = {"application/json"})
     public @ResponseBody
-    Bug addNewBug(@RequestBody Bug bug) {
-        this.bugRepository.save(bug);
-        return bug;
+    Bug addNewBug(@RequestBody String jsonString) {
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            JsonNode jsonNode = mapper.reader().readTree(jsonString);
+            String reporter = jsonNode.get("reporter").asText();
+            String summary = jsonNode.get("summary").asText();
+            String description = jsonNode.get("description").asText();
+            String version = jsonNode.get("version").asText();
+            Software software = this.softwareRepository.findByVersion(version);
+            return this.bugRepository.save(new Bug(summary, description, software, reporter));
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new BadRequestException("Could not save the bug object.", e);
+        }
     }
 
     @ResponseStatus(code = HttpStatus.OK)
@@ -150,8 +170,13 @@ public class PrivateDataController {
     @ResponseStatus(code = HttpStatus.OK)
     @GetMapping(path = "/bugs/all")
     public @ResponseBody
-    Iterable<Bug> getBugs() {
-        return this.bugRepository.findAll();
+    String getBugs() {
+        ArrayNode jsonArrayOfBugs = new ObjectMapper().createArrayNode();
+        List<Bug> listOfBugs = this.bugRepository.findAll();
+        for (Bug bug : listOfBugs) {
+            jsonArrayOfBugs.add(bug.toJson());
+        }
+        return jsonArrayOfBugs.toString();
     }
 
 

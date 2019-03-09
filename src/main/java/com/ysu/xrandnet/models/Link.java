@@ -25,6 +25,9 @@ public class Link {
         this.type = type;
     }
 
+    public Link() {
+    }
+
     public String getName() {
         return name;
     }

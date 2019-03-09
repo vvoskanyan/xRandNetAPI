@@ -29,13 +29,14 @@ public class PublicDataController {
     private final BooksRepository bookRepository;
     private final AboutInfoRepository aboutInfoRepository;
     private final UserManualFileRepository userManualFileRepository;
+    private final SoftwareRepository softwareRepository;
     private final SetupFileRepository setupFileRepository;
     private final com.ysu.xrandnet.services.DBFileStorageService dbFileStorageService;
 
     @Autowired
     public PublicDataController(AnnouncementRepository announcementRepository, ReleaseNoteRepository releaseNoteRepository,
                                 BooksRepository bookRepository, AboutInfoRepository aboutInfoRepository,
-                                UserManualFileRepository userManualFileRepository, SetupFileRepository setupFileRepository,
+                                UserManualFileRepository userManualFileRepository, SoftwareRepository softwareRepository, SetupFileRepository setupFileRepository,
                                 DBFileStorageService dbFileStorageService, LinkRepository linkRepository, PersonRepository personRepository) {
         this.announcementRepository = announcementRepository;
         this.releaseNoteRepository = releaseNoteRepository;
@@ -44,6 +45,7 @@ public class PublicDataController {
         this.aboutInfoRepository = aboutInfoRepository;
         this.userManualFileRepository = userManualFileRepository;
         this.setupFileRepository = setupFileRepository;
+        this.softwareRepository = softwareRepository;
         this.dbFileStorageService = dbFileStorageService;
         this.linkRepository = linkRepository;
     }
@@ -131,6 +133,14 @@ public class PublicDataController {
             return list.get(0);
         }
     }
+
+    @ResponseStatus(code = HttpStatus.OK)
+    @GetMapping(path = "/softwareVersions")
+    public @ResponseBody
+    Iterable<String> getSoftwareVersions() {
+        return softwareRepository.getAllVersions();
+    }
+
 
     @GetMapping("/downloadFile/{fileId}")
     public ResponseEntity<Resource> downloadFile(@PathVariable String fileId) {
