@@ -19,6 +19,12 @@ public class Link {
     @Column(name = "type", columnDefinition = "TEXT")
     private LinkType type;
 
+    public Link(String name, String url, LinkType type) {
+        this.name = name;
+        this.url = url;
+        this.type = type;
+    }
+
     public String getName() {
         return name;
     }

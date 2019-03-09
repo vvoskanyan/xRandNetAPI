@@ -60,13 +60,13 @@ public class PublicDataController {
     @GetMapping(path = "/setupFiles/all")
     public @ResponseBody
     String getSetupFiles() {
-        List<File> arrayList = this.setupFileRepository.findAllFileNameAndIds();
+        List<SetupFile> arrayList = this.setupFileRepository.findAll();
         JSONArray jsonArray = new JSONArray();
         arrayList.forEach((file) -> {
             try {
                 JSONObject jsonObject = new JSONObject();
                 jsonObject.put("id", file.getId());
-                jsonObject.put("name", file.getFile_Name());
+                jsonObject.put("name", file.getFileName());
                 jsonArray.put(jsonObject);
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -79,8 +79,8 @@ public class PublicDataController {
     @GetMapping(path = "/userManualFile")
     public @ResponseBody
     ResponseEntity getUserManualFile() {
-        File file = this.userManualFileRepository.findAllFileNameAndId();
-        DBFile dbFile = this.dbFileStorageService.getFile(file.getId());
+        UserManualFile file = this.userManualFileRepository.findAll().get(0);
+        DBFile dbFile = this.dbFileStorageService.getUserManualFile(file.getId());
         return ResponseEntity.ok()
                 .contentType(MediaType.parseMediaType(dbFile.getFileType()))
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + dbFile.getFileName() + "\"")
@@ -124,7 +124,12 @@ public class PublicDataController {
     @GetMapping(path = "/about")
     public @ResponseBody
     AboutInfo getAboutInfo() {
-        return this.aboutInfoRepository.findAll().get(0);
+        List<AboutInfo> list = this.aboutInfoRepository.findAll();
+        if (list.isEmpty()) {
+            return null;
+        } else {
+            return list.get(0);
+        }
     }
 
     @GetMapping("/downloadFile/{fileId}")

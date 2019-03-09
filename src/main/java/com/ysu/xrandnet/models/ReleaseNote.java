@@ -16,6 +16,20 @@ public class ReleaseNote {
     @Column(name = "description", nullable = false)
     private String description;
 
+
+    public ReleaseNote(String version, String description) {
+        this.version = version;
+        this.description = description;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
     public String getVersion() {
         return version;
     }

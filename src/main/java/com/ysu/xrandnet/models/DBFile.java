@@ -1,22 +1,21 @@
 package com.ysu.xrandnet.models;
 
+
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 
-@Entity
-@Table(name = "files")
-@Inheritance(
-        strategy = InheritanceType.SINGLE_TABLE
-)
+@MappedSuperclass
 public class DBFile extends DateAudit {
     @Id
     @GeneratedValue(generator = "uuid")
     @GenericGenerator(name = "uuid", strategy = "uuid2")
     protected String id;
 
+    @Column()
     protected String fileName;
 
+    @Column()
     protected String fileType;
 
     @Lob
@@ -31,8 +30,6 @@ public class DBFile extends DateAudit {
         this.fileType = fileType;
         this.data = data;
     }
-
-    // Getters and Setters (Omitted for brevity)
 
     public String getId() {
         return id;

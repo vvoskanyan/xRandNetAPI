@@ -6,7 +6,6 @@ import com.ysu.xrandnet.repos.*;
 import com.ysu.xrandnet.services.DBFileStorageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -47,7 +46,7 @@ public class PrivateDataController {
     @PostMapping("/uploadSetupFile")
     public @ResponseBody
     UploadFileResponse uploadSetupFile(@RequestParam("file") MultipartFile file) {
-        DBFile dbFile = dbFileStorageService.storeSetupFile(file);
+        SetupFile dbFile = (SetupFile) dbFileStorageService.storeSetupFile(file);
 
         String fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath()
                 .path(dbFile.getId())
@@ -61,7 +60,7 @@ public class PrivateDataController {
     @PostMapping("/uploadUserManualFile")
     public @ResponseBody
     UploadFileResponse uploadUserManualFile(@RequestParam("file") MultipartFile file) {
-        DBFile dbFile = dbFileStorageService.storeUserManual(file);
+        UserManualFile dbFile = (UserManualFile) dbFileStorageService.storeUserManual(file);
 
         String fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath()
                 .path(dbFile.getId())
@@ -136,9 +135,11 @@ public class PrivateDataController {
     @RequestMapping(method = RequestMethod.POST, path = "/about/edit", consumes = {"application/json"})
     public @ResponseBody
     AboutInfo editAboutInfo(@RequestBody AboutInfo aboutInfo) {
-        AboutInfo infoToBeUpdated = this.aboutInfoRepository.findAll().get(0);
-        if (infoToBeUpdated == null) {
+        AboutInfo infoToBeUpdated = null;
+        if (this.aboutInfoRepository.findAll().isEmpty()) {
             infoToBeUpdated = new AboutInfo();
+        } else {
+            infoToBeUpdated = this.aboutInfoRepository.findAll().get(0);
         }
         infoToBeUpdated.setContent(aboutInfo.getContent());
         this.aboutInfoRepository.deleteAll();

@@ -16,8 +16,27 @@ public class Bug extends DateAudit {
     @Column(name = "description", columnDefinition = "text")
     private String description;
 
+    @ManyToOne
+    @JoinColumn
+    private Software software;
+
+    public Bug(String summary, String description, Software software, String reporter) {
+        this.summary = summary;
+        this.description = description;
+        this.software = software;
+        this.reporter = reporter;
+    }
+
     @Column(name = "reporter")
     private String reporter;
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
 
     public String getDescription() {
         return description;
@@ -35,9 +54,6 @@ public class Bug extends DateAudit {
         this.summary = summary;
     }
 
-    public int getId() {
-        return id;
-    }
 
     public String getReporter() {
         return reporter;
@@ -45,5 +61,13 @@ public class Bug extends DateAudit {
 
     public void setReporter(String reporter) {
         this.reporter = reporter;
+    }
+
+    public Software getSoftware() {
+        return software;
+    }
+
+    public void setSoftware(Software software) {
+        this.software = software;
     }
 }

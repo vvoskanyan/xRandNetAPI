@@ -5,7 +5,6 @@ import com.ysu.xrandnet.exceptions.MyFileNotFoundException;
 import com.ysu.xrandnet.models.DBFile;
 import com.ysu.xrandnet.models.SetupFile;
 import com.ysu.xrandnet.models.UserManualFile;
-import com.ysu.xrandnet.repos.DBFileRepository;
 import com.ysu.xrandnet.repos.SetupFileRepository;
 import com.ysu.xrandnet.repos.UserManualFileRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,33 +18,13 @@ import java.io.IOException;
 @Service
 public class DBFileStorageService {
 
-    private final DBFileRepository dbFileRepository;
     private final SetupFileRepository setupFileRepository;
     private final UserManualFileRepository userManualFileRepository;
 
     @Autowired
-    public DBFileStorageService(DBFileRepository dbFileRepository, SetupFileRepository setupFileRepository, UserManualFileRepository userManualFileRepository) {
-        this.dbFileRepository = dbFileRepository;
+    public DBFileStorageService(SetupFileRepository setupFileRepository, UserManualFileRepository userManualFileRepository) {
         this.setupFileRepository = setupFileRepository;
         this.userManualFileRepository = userManualFileRepository;
-    }
-
-    public DBFile storeFile(MultipartFile file) {
-        // Normalize file name
-        String fileName = StringUtils.cleanPath(file.getOriginalFilename());
-
-        try {
-            // Check if the file's name contains invalid characters
-            if (fileName.contains("..")) {
-                throw new FileStorageException("Sorry! Filename contains invalid path sequence " + fileName);
-            }
-
-            DBFile dbFile = new DBFile(fileName, file.getContentType(), file.getBytes());
-
-            return (DBFile) this.dbFileRepository.save(dbFile);
-        } catch (IOException ex) {
-            throw new FileStorageException("Could not store file " + fileName + ". Please try again!", ex);
-        }
     }
 
     public DBFile storeFile(MultipartFile file, JpaRepository repository) {
@@ -58,7 +37,6 @@ public class DBFileStorageService {
                 throw new FileStorageException("Sorry! Filename contains invalid path sequence " + fileName);
             }
 
-
             if (repository instanceof SetupFileRepository) {
                 SetupFile dbFile = new SetupFile(fileName, file.getContentType(), file.getBytes());
                 return this.setupFileRepository.save(dbFile);
@@ -68,8 +46,7 @@ public class DBFileStorageService {
                 this.userManualFileRepository.deleteAll();
                 return this.userManualFileRepository.save(dbFile);
             } else {
-                DBFile dbFile = new DBFile(fileName, file.getContentType(), file.getBytes());
-                return this.dbFileRepository.save(dbFile);
+                throw new FileStorageException("Unknown file type");
             }
 
         } catch (IOException ex) {
@@ -86,8 +63,25 @@ public class DBFileStorageService {
 
     }
 
-    public DBFile getFile(String fileId) {
-        return dbFileRepository.findById(fileId)
+    public DBFile getUserManualFile(String fileId) {
+        return userManualFileRepository.findById(fileId)
                 .orElseThrow(() -> new MyFileNotFoundException("File not found with id " + fileId));
+    }
+
+    public SetupFile getSetupFile(String fileId) {
+        return setupFileRepository.findById(fileId)
+                .orElseThrow(() -> new MyFileNotFoundException("File not found with id " + fileId));
+    }
+
+    public DBFile getFile(String fileId) {
+        if (this.setupFileRepository.existsById(fileId)) {
+            return setupFileRepository.findById(fileId)
+                    .orElseThrow(() -> new MyFileNotFoundException("File not found with id " + fileId));
+        } else if (this.userManualFileRepository.existsById(fileId)) {
+            return userManualFileRepository.findById(fileId)
+                    .orElseThrow(() -> new MyFileNotFoundException("File not found with id " + fileId));
+        } else {
+            throw new MyFileNotFoundException("File not found with id " + fileId);
+        }
     }
 }
