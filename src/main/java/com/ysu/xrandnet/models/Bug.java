@@ -22,6 +22,9 @@ public class Bug extends DateAudit {
     @Column(name = "description", columnDefinition = "text")
     private String description;
 
+    @Column(name = "status")
+    private BugStatus status;
+
     @ManyToOne
     @JoinColumn(name = "software_version", nullable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
@@ -33,6 +36,7 @@ public class Bug extends DateAudit {
         this.description = description;
         this.software = software;
         this.reporter = reporter;
+        this.status = BugStatus.OPEN;
     }
 
     public Bug() {
@@ -82,12 +86,21 @@ public class Bug extends DateAudit {
         this.software = software;
     }
 
+    public BugStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(BugStatus status) {
+        this.status = status;
+    }
+
     public ObjectNode toJson() {
         ObjectNode node = new ObjectMapper().createObjectNode();
         node.put("id", this.id);
         node.put("summary", this.summary);
         node.put("version", this.software.getVersion());
         node.put("reporter", this.reporter);
+        node.put("status", this.status.getBugStatusId());
         node.put("description", this.description);
         node.put("createdAt", this.getCreatedAt().toString());
         node.put("updatedAt", this.getUpdatedAt().toString());

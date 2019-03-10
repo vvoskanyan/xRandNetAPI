@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Controller
@@ -95,6 +94,47 @@ public class PrivateDataController {
         } catch (Exception e) {
             e.printStackTrace();
             throw new BadRequestException("Could not save the bug object.", e);
+        }
+    }
+
+    @ResponseStatus(code = HttpStatus.OK)
+    @RequestMapping(method = RequestMethod.POST, path = "/bugs/delete", consumes = {"application/json"})
+    public @ResponseBody
+    void deleteBug(@RequestBody String jsonString) {
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            JsonNode jsonNode = mapper.reader().readTree(jsonString);
+            int id = jsonNode.get("id").asInt();
+            if (this.bugRepository.existsById(id)) {
+                this.bugRepository.deleteById(id);
+            } else {
+                throw new BadRequestException("There is no bug with id " + id);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new BadRequestException("Could not delete the bug.", e);
+        }
+    }
+
+    @ResponseStatus(code = HttpStatus.OK)
+    @RequestMapping(method = RequestMethod.POST, path = "/bugs/edit", consumes = {"application/json"})
+    public @ResponseBody
+    void editBug(@RequestBody String jsonString) {
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            JsonNode jsonNode = mapper.reader().readTree(jsonString);
+            int id = jsonNode.get("id").asInt();
+            int statusValue = jsonNode.get("status").asInt();
+            if (this.bugRepository.existsById(id)) {
+                Bug bug = this.bugRepository.findById(id);
+                bug.setStatus(BugStatus.getFromValue(statusValue));
+                this.bugRepository.save(bug);
+            } else {
+                throw new BadRequestException("There is no bug with id " + id);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new BadRequestException("Could not edit the bug.", e);
         }
     }
 
