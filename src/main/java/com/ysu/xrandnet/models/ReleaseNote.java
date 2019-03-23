@@ -1,5 +1,9 @@
 package com.ysu.xrandnet.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
 import javax.persistence.*;
 
 @Entity
@@ -10,16 +14,22 @@ public class ReleaseNote {
     @Column(name = "id")
     private int id;
 
-    @Column(name = "version", unique = true, nullable = false)
-    private String version;
-
     @Column(name = "description", nullable = false)
     private String description;
 
+    @ManyToOne
+    @JoinColumn(name = "software_version", nullable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    @JsonIgnore
+    private Software software;
 
-    public ReleaseNote(String version, String description) {
-        this.version = version;
+    public ReleaseNote(Software software, String description) {
+        this.software = software;
         this.description = description;
+    }
+
+    public ReleaseNote() {
+
     }
 
     public int getId() {
@@ -30,12 +40,12 @@ public class ReleaseNote {
         this.id = id;
     }
 
-    public String getVersion() {
-        return version;
+    public Software getSoftware() {
+        return software;
     }
 
-    public void setVersion(String version) {
-        this.version = version;
+    public void setSoftware(Software software) {
+        this.software = software;
     }
 
     public String getDescription() {

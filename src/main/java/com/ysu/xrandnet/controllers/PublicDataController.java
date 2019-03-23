@@ -97,6 +97,13 @@ public class PublicDataController {
     }
 
     @ResponseStatus(code = HttpStatus.OK)
+    @GetMapping(path = "/releaseNotes/{version}")
+    public @ResponseBody
+    Iterable<ReleaseNote> getReleaseNotes(@PathVariable("version") String softwareVersion) {
+        return this.releaseNoteRepository.findBySoftware_Version(softwareVersion);
+    }
+
+    @ResponseStatus(code = HttpStatus.OK)
     @GetMapping(path = "/books/all")
     public @ResponseBody
     Iterable<Book> getBooks() {

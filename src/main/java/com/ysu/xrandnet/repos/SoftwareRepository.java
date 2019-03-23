@@ -11,6 +11,8 @@ import java.util.List;
 public interface SoftwareRepository extends JpaRepository<Software, Integer> {
     Software findByVersion(String version);
 
+    boolean existsByVersion(String version);
+
     @Query(value = "SELECT version FROM xrandnet.software", nativeQuery = true)
     List<String> getAllVersions();
 }

@@ -51,15 +51,33 @@ public class PrivateDataController {
     }
 
     @ResponseStatus(code = HttpStatus.OK)
-    @PostMapping("/uploadSetupFile")
+    @PostMapping("/uploadSoftware")
     public @ResponseBody
-    UploadFileResponse uploadSetupFile(@RequestParam("file") MultipartFile file) {
+    UploadFileResponse uploadSetupFile(@RequestParam("file") MultipartFile file, @RequestParam("software") String jsonString) {
+        ObjectMapper mapper = new ObjectMapper();
+        Software software = null;
+        try {
+            JsonNode jsonNode = mapper.reader().readTree(jsonString);
+            String version = jsonNode.get("_version").asText();
+            if (!this.softwareRepository.existsByVersion(version)) {
+                software = new Software();
+                software.setVersion(version);
+                ArrayNode releaseNotes = (ArrayNode) jsonNode.get("_releaseNotes");
+                for (final JsonNode objNode : releaseNotes) {
+                    software.getReleaseNotes().add(new ReleaseNote(software, objNode.get("_description").asText()));
+                }
+            } else {
+                throw new BadRequestException("There is a software with specified version " + version);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new BadRequestException("Could not save the software.", e);
+        }
         SetupFile dbFile = (SetupFile) dbFileStorageService.storeSetupFile(file);
-
-        String fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath()
-                .path(dbFile.getId())
+        software.setSetupFile(dbFile);
+        this.softwareRepository.save(software);
+        String fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath().path(dbFile.getId())
                 .toUriString();
-
         return new UploadFileResponse(dbFile.getFileName(), fileDownloadUri,
                 file.getContentType(), file.getSize());
     }
@@ -146,15 +164,6 @@ public class PrivateDataController {
         return person;
     }
 
-
-    @ResponseStatus(code = HttpStatus.OK)
-    @RequestMapping(method = RequestMethod.POST, path = "/releaseNotes/add", consumes = {"application/json"})
-    public @ResponseBody
-    ReleaseNote addNewReleaseNote(@RequestBody ReleaseNote releaseNote) {
-        this.releaseNoteRepository.save(releaseNote);
-        return releaseNote;
-    }
-
     @ResponseStatus(code = HttpStatus.OK)
     @RequestMapping(method = RequestMethod.POST, path = "/links/add", consumes = {"application/json"})
     public @ResponseBody
@@ -181,7 +190,6 @@ public class PrivateDataController {
             this.linkRepository.save(link);
         }
     }
-
 
     @ResponseStatus(code = HttpStatus.OK)
     @RequestMapping(method = RequestMethod.POST, path = "/announcements/add", consumes = {"application/json"})
@@ -218,29 +226,6 @@ public class PrivateDataController {
         }
         return jsonArrayOfBugs.toString();
     }
-
-
-//    @PostMapping("/uploadFile")
-//    public UploadFileResponse uploadFile(@RequestParam("file") MultipartFile file) {
-//        DBFile dbFile = DBFileStorageService.storeFile(file);
-//
-//        String fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath()
-//                .path("/downloadFile/")
-//                .path(dbFile.getId())
-//                .toUriString();
-//
-//        return new UploadFileResponse(dbFile.getFileName(), fileDownloadUri,
-//                file.getContentType(), file.getSize());
-//    }
-
-
-//
-//    @PostMapping("/uploadMultipleFiles")
-//    public List<UploadFileResponse> uploadMultipleFiles(@RequestParam("files") MultipartFile[] files) {
-//        return Arrays.stream(files)
-//                .map(this::uploadFile)
-//                .collect(Collectors.toList());
-//    }
 
 
 }

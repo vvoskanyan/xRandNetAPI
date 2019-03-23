@@ -1,5 +1,6 @@
 package com.ysu.xrandnet.models;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
@@ -8,7 +9,7 @@ import javax.persistence.Table;
 @Table(name = "setup_files")
 public class SetupFile extends DBFile {
 
-    @OneToOne(mappedBy = "setupFile")
+    @OneToOne(mappedBy = "setupFile", cascade = CascadeType.ALL)
     private Software software;
 
     public SetupFile(String fileName, String fileType, byte[] data) {

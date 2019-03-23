@@ -1,6 +1,10 @@
 package com.ysu.xrandnet.models;
 
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -13,11 +17,17 @@ public class Software {
     @OneToMany(mappedBy = "software", cascade = CascadeType.ALL)
     private List<Bug> bugs;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "file_id", referencedColumnName = "id")
+    @OneToMany(mappedBy = "software", cascade = CascadeType.ALL)
+    private List<ReleaseNote> releaseNotes;
+
+    @OneToOne
+    @JoinColumn(name = "file_id", referencedColumnName = "id", nullable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private SetupFile setupFile;
 
     public Software() {
+        this.releaseNotes = new ArrayList<>();
+        this.bugs = new ArrayList<>();
     }
 
     public Software(String version, List<Bug> bugs, SetupFile setupFile) {
@@ -40,6 +50,14 @@ public class Software {
 
     public void setBugs(List<Bug> bugs) {
         this.bugs = bugs;
+    }
+
+    public List<ReleaseNote> getReleaseNotes() {
+        return releaseNotes;
+    }
+
+    public void setReleaseNotes(List<ReleaseNote> releaseNotes) {
+        this.releaseNotes = releaseNotes;
     }
 
     public SetupFile getSetupFile() {

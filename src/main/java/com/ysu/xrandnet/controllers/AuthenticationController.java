@@ -108,14 +108,17 @@ public class AuthenticationController {
         User user = new User(signUpRequest.getFirstName(), signUpRequest.getLastName(), signUpRequest.getUsername(), signUpRequest.getPassword());
 
         user.setPassword(passwordEncoder.encode(user.getPassword()));
+        Role userRole = null;
+        if (this.userRepository.findAll().isEmpty()) {
+            userRole = roleRepository.findByName(RoleName.ROLE_ADMIN)
+                    .orElseThrow(() -> new AppException("Admin Role not set."));
 
-        Role userRole = roleRepository.findByName(RoleName.ROLE_USER)
-                .orElseThrow(() -> new AppException("User Role not set."));
-
+        } else {
+            userRole = roleRepository.findByName(RoleName.ROLE_USER)
+                    .orElseThrow(() -> new AppException("User Role not set."));
+        }
         user.setRoles(Collections.singleton(userRole));
-
         User result = userRepository.save(user);
-
         URI location = ServletUriComponentsBuilder
                 .fromCurrentContextPath().path("/api/users/{username}")
                 .buildAndExpand(result.getUsername()).toUri();
