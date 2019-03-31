@@ -1,6 +1,6 @@
 package com.ysu.xrandnet.models;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.hibernate.annotations.OnDelete;
@@ -28,7 +28,9 @@ public class Bug extends DateAudit {
     @ManyToOne
     @JoinColumn(name = "software_version", nullable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
-    @JsonIgnore
+    @JsonProperty("version")
+    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "version")
+    @JsonIdentityReference(alwaysAsId = true)
     private Software software;
 
     public Bug(String summary, String description, Software software, String reporter) {
