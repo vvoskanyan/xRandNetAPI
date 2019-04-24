@@ -1,6 +1,7 @@
 package com.ysu.xrandnet.models;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
@@ -19,6 +20,7 @@ public class DBFile extends DateAudit {
     protected String fileType;
 
     @Lob
+    @JsonIgnore
     protected byte[] data;
 
     public DBFile() {

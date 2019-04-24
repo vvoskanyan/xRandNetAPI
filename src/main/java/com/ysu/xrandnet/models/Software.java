@@ -1,5 +1,6 @@
 package com.ysu.xrandnet.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
@@ -15,6 +16,7 @@ public class Software {
     private String version;
 
     @OneToMany(mappedBy = "software", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<Bug> bugs;
 
     @OneToMany(mappedBy = "software", cascade = CascadeType.ALL)

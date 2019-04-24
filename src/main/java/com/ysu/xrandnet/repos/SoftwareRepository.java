@@ -15,4 +15,7 @@ public interface SoftwareRepository extends JpaRepository<Software, Integer> {
 
     @Query(value = "SELECT version FROM xrandnet.software", nativeQuery = true)
     List<String> getAllVersions();
+
+    @Query(value = "SELECT version FROM xrandnet.software ORDER BY version DESC LIMIT 1", nativeQuery = true)
+    String getLastVersion();
 }

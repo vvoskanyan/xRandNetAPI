@@ -148,6 +148,20 @@ public class PublicDataController {
         return softwareRepository.getAllVersions();
     }
 
+    @ResponseStatus(code = HttpStatus.OK)
+    @GetMapping(path = "/lastVersion")
+    public @ResponseBody
+    Software getLastVersion() {
+        return softwareRepository.findByVersion(softwareRepository.getLastVersion());
+    }
+
+    @ResponseStatus(code = HttpStatus.OK)
+    @GetMapping(path = "/softwares")
+    public @ResponseBody
+    Iterable<Software> getSoftware() {
+        return softwareRepository.findAll();
+    }
+
 
     @GetMapping("/downloadFile/{fileId}")
     public ResponseEntity<Resource> downloadFile(@PathVariable String fileId) {
