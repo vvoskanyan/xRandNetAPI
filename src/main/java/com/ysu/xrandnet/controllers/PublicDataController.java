@@ -16,6 +16,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.util.List;
 
@@ -114,6 +115,8 @@ public class PublicDataController {
     @GetMapping(path = "/people/all")
     public @ResponseBody
     Iterable<Person> getPeople() {
+//        String fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath().path(dbFile.getId())
+//                .toUriString();
         return this.personRepository.findAll();
     }
 

@@ -34,7 +34,8 @@ public class PrivateDataController {
 
     @Autowired
     public PrivateDataController(AnnouncementRepository announcementRepository, ReleaseNoteRepository releaseNoteRepository,
-                                 BugRepository bugRepository, SoftwareRepository softwareRepository, BooksRepository bookRepository, AboutInfoRepository aboutInfoRepository,
+                                 BugRepository bugRepository, SoftwareRepository softwareRepository,
+                                 BooksRepository bookRepository, AboutInfoRepository aboutInfoRepository,
                                  UserManualFileRepository userManualFileRepository, SetupFileRepository setupFileRepository,
                                  DBFileStorageService dbFileStorageService, LinkRepository linkRepository, PersonRepository personRepository) {
         this.announcementRepository = announcementRepository;
@@ -159,7 +160,9 @@ public class PrivateDataController {
     @ResponseStatus(code = HttpStatus.OK)
     @RequestMapping(method = RequestMethod.POST, path = "/people/add", consumes = {"application/json"})
     public @ResponseBody
-    Person addNewPerson(@RequestBody Person person) {
+    Person addNewPerson(@RequestBody Person person, @RequestParam("imageFile") MultipartFile file) {
+        ImageFile dbFile = (ImageFile) dbFileStorageService.storeImageFile(file);
+        person.setImageFile(dbFile);
         this.personRepository.save(person);
         return person;
     }

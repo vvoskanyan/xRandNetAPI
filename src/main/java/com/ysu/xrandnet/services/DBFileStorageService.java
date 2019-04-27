@@ -5,6 +5,7 @@ import com.ysu.xrandnet.exceptions.MyFileNotFoundException;
 import com.ysu.xrandnet.models.DBFile;
 import com.ysu.xrandnet.models.SetupFile;
 import com.ysu.xrandnet.models.UserManualFile;
+import com.ysu.xrandnet.repos.ImageFileRepository;
 import com.ysu.xrandnet.repos.SetupFileRepository;
 import com.ysu.xrandnet.repos.UserManualFileRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,9 +21,12 @@ public class DBFileStorageService {
 
     private final SetupFileRepository setupFileRepository;
     private final UserManualFileRepository userManualFileRepository;
+    private final ImageFileRepository imageFileRepository;
 
     @Autowired
-    public DBFileStorageService(SetupFileRepository setupFileRepository, UserManualFileRepository userManualFileRepository) {
+    public DBFileStorageService(SetupFileRepository setupFileRepository, UserManualFileRepository userManualFileRepository,
+                                ImageFileRepository imageFileRepository) {
+        this.imageFileRepository = imageFileRepository;
         this.setupFileRepository = setupFileRepository;
         this.userManualFileRepository = userManualFileRepository;
     }
@@ -60,6 +64,11 @@ public class DBFileStorageService {
 
     public DBFile storeSetupFile(MultipartFile setupFile) {
         return this.storeFile(setupFile, this.setupFileRepository);
+
+    }
+
+    public DBFile storeImageFile(MultipartFile imageFile) {
+        return this.storeFile(imageFile, this.imageFileRepository);
 
     }
 
